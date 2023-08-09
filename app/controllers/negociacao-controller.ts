@@ -9,21 +9,23 @@ export class NegociacaoController {
     private inputQuantidade: HTMLInputElement
     private inputValor: HTMLInputElement
     private negociacoes: Negociacoes = new Negociacoes()
-    private negociacoesView = new NegociacoesView('#negociacoesView')
-    private mensagemView = new MensagemView('#mensagemView')
-    private readonly SABADO = 6
-    private readonly DOMINGO = 0
+    private negociacoesView = new NegociacoesView('#negociacoesView', true)
+    private mensagemView = new MensagemView('#mensagemView', false)
 
 
     constructor(){
-        this.inputData = document.querySelector('#data')
-        this.inputQuantidade = document.querySelector('#quantidade')
-        this.inputValor = document.querySelector('#valor')
+        this.inputData = <HTMLInputElement>document.querySelector('#data')
+        this.inputQuantidade = document.querySelector('#quantidade') as HTMLInputElement
+        this.inputValor = document.querySelector('#valor') as HTMLInputElement
         this.negociacoesView.update(this.negociacoes)
     }
 
     public adiciona(): void{
-        const negociacao = this.criaNegociacao()
+        const negociacao = Negociacao.criaDe(
+            this.inputData.value,
+            this.inputQuantidade.value,
+            this.inputValor.value
+        )
         if(!this.ehDiaUtil(negociacao.data)){
             this.mensagemView.update('Apenas negociações em dias úteis são aceitas.')
             return 
@@ -35,14 +37,6 @@ export class NegociacaoController {
 
     private ehDiaUtil(data: Date){
         return data.getDay() > DiaDaSemana.DOMINGO && data.getDay() < DiaDaSemana.SABADO
-    }
-
-    private criaNegociacao(): Negociacao{
-        const exp = /-/g
-        const date = new Date(this.inputData.value.replace(exp, ','))
-        const quantidade = parseInt(this.inputQuantidade.value)
-        const valor = parseFloat(this.inputValor.value)
-        return new Negociacao(date, quantidade, valor)
     }
 
     private limparFormulario(): void{
